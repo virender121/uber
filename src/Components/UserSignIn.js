@@ -1,23 +1,24 @@
-import React, { Component } from "react";
-import axios from "axios";
-import "antd/dist/antd.css";
-import "./UserSignIn.css";
-import Paper from 'material-ui/Paper';
-import Avatar from 'material-ui/Avatar';
+import { Avatar } from "material-ui";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import SignInImage from './Images/download.jpg';
-import { Form, Input, Button } from "antd";
-import { locales } from "moment";
+const Signup = () => {
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+  });
 
-const stylePaper = {
-    height: '440px',
-    width: '400px',
-    background: '#f8f8f9',
-    position: 'relative',
-    marginLeft:'35%',
-    marginTop: '70px'
-};
+  const [errors, setErrors] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+  });
 
-const styleText = {
+  const navigate = useNavigate();
+  const styleText = {
     marginLeft: '100px',
     marginTop: '-50px',
     fontSize: '1.71429rem',
@@ -25,120 +26,67 @@ const styleText = {
     fontWeight: '400'
 };
 
-const FormItem = Form.Item;
-
-class Signup extends Component {
-  state = {
-    res: {},
-    res_received: false
-  };
-
-  handleSubmit = e => {
-    e.preventDefault();
-    this.props.form.validateFields((err, fieldsValue) => {
-      if (!err) {
-        const values = {
-          ...fieldsValue,
-          role: 'user'        
-        };
-        //delete values[""];
-        console.log("Received values of form: ", values);
-        axios
-          .post("https://api.crossfire37.hasura-app.io/signup", {
-            "user" : {
-              "provider" : "username",
-              "data": {
-                "username": values.firstname,
-                "password": values.password
-              }
-            },
-            "role": values.role,
-            "firstname": values.firstname,
-            "lastname":  values.lastname
-            }
-          )
-          .then(response => {
-            console.log(response);
-            localStorage.setItem('AuthToken' ,response.data.auth_token)
-            this.setState({ res: response.data });
-            this.setState({ res_received: true });
-          })
-          .catch(error => {
-            alert("ERROR: User name already exists!");
-            console.log(error);
-          });
-      }
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData({
+      ...formData,
+      [name]: value,
     });
   };
-
-  render() {
-    const { getFieldDecorator } = this.props.form;
-    let result = null;
-    if (this.state.res_received) {
-      alert('Sign Up Succesful! Please go to "Ride" to book your ride.');
-      console.log(this.state.res_recieved);
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/;
+  
+    let errorsCopy = { ...errors };
+    errorsCopy.firstName = formData.firstName ? "" : "Please enter your first name";
+    errorsCopy.lastName = formData.lastName ? "" : "Please enter your last name";
+    errorsCopy.email = emailRegex.test(formData.email) ? "" : "Please enter a valid email address";
+    errorsCopy.password = passwordRegex.test(formData.password) ? "" : "Password must be at least 8 characters and contain at least one uppercase letter, one lowercase letter, and one number";
+  
+    setErrors(errorsCopy);
+  
+    // If there are no errors, submit the form and add the data to local storage
+    if (!Object.values(errorsCopy).some((error) => error !== "")) {
+      localStorage.setItem("formData", JSON.stringify(formData));
+      console.log(formData);
+    
+    navigate('/Login');
     }
+  };
+  
 
-    return (
-      <Paper style={stylePaper}>
-        
-        <Form onSubmit={this.handleSubmit} className="signup-form">
-          <div style={{marginLeft:'0px', marginBottom: '40px'}}>
+  return (
+    <form onSubmit={handleSubmit} className="signup-form ">
+       <div style={{marginLeft:'0px', marginBottom: '40px'}}>
               <Avatar src={SignInImage} size='80px' />  
               <div style={styleText}>
                 Ride With Uber
               </div>
-          </div>
-          <FormItem>
-            {getFieldDecorator("firstname", {
-              rules: [{ required: true, message: "Please input your First Name!" }]
-            })(<Input placeholder="First Name" />)}
-          </FormItem>
-          <FormItem>
-            {getFieldDecorator("lastname", {
-              rules: [{ required: true, message: "Please input your Last Name!" }]
-            })(<Input placeholder="Last Name" />)}
-          </FormItem>
-          <FormItem>
-            {getFieldDecorator("email", {
-              rules: [
-                {
-                  type: "email",
-                  message: "The input is not valid E-mail!"
-                },
-                {
-                  required: true,
-                  message: "Please input your E-mail!"
-                }
-              ]
-            })(<Input placeholder="Email" />)}
-          </FormItem>
-          <FormItem>
-            {getFieldDecorator("password", {
-              rules: [
-                { required: true, message: "Please input your Password!" },
-                { min: 8, message: "Minimum password length is 8 characters" }
-              ]
-            })(<Input type="password" placeholder="Password" />)}
-          </FormItem>
-        
-          <FormItem>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="signup-form-button"
-            >
-              SIGN UP
-            </Button>
-            Or <a href="/Login">Login</a>
-          </FormItem>
-          {result}
-        </Form>
-      </Paper>
-    );
-  }
-}
+              </div>
+      <div className="form">
+        {/* <label htmlFor="firstName"className="lable">First Name:</label> */}
+        <input type="text" name="firstName" value={formData.firstName} onChange={handleInputChange} className="input"/>
+        <span>{errors.firstName}</span>
+      </div>
+      <div>
+        {/* <label htmlFor="lastName"className="lable">Last Name:</label> */}
+        <input type="text" name="lastName" value={formData.lastName} onChange={handleInputChange} className="input"/>
+        <span>{errors.lastName}</span>
+      </div>
+      <div>
+        {/* <label htmlFor="email"className="lable">Email:</label> */}
+        <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="input"/>
+        <span>{errors.email}</span>
+      </div>
+      <div>
+        {/* <label htmlFor="password" className="lable">Password:</label> */}
+        <input type="password" name="password" value={formData.password} onChange={handleInputChange} className="input"/>
+        <span className="span">{errors.password}</span>
+      </div>
+      <button type="submit" className="button">Submit</button>
+    </form>
+  );
+};
 
-const Sign_up = Form.create()(Signup);
-
-export default Sign_up;
+export default Signup;

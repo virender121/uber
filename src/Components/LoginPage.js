@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import "antd/dist/antd.css";
 import "./UserSignIn.css";
@@ -6,7 +6,7 @@ import Paper from 'material-ui/Paper';
 import Avatar from 'material-ui/Avatar';
 import SignInImage from './Images/download.jpg';
 import { Form, Input, Button } from "antd";
-import { locales } from "moment";
+import { useNavigate } from 'react-router-dom';
 
 const stylePaper = {
     height: '330px',
@@ -25,94 +25,63 @@ const styleText = {
     fontWeight: '400'
 };
 
-const FormItem = Form.Item;
+const Signin = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-class Signup extends Component {
-  state = {
-    res: {},
-    res_received: false
-  };
-
-  handleSubmit = e => {
+  const handleSubmit = e => {
     e.preventDefault();
-    this.props.form.validateFields((err, fieldsValue) => {
-      if (!err) {
-        const values = {
-          ...fieldsValue,        
-        };
-        console.log("Received values of form: ", values);
-        axios
-          .post("https://api.crossfire37.hasura-app.io/login", 
-              {
-                "provider" : "username",
-                "data": {
-                  "username": values.firstname,
-                  "password": values.password
-                }
-              }
-          )
-          .then(response => {
-            console.log(response);
-            localStorage.setItem('AuthToken' ,response.data.auth_token)
-            this.setState({ res: response.data });
-            this.setState({ res_received: true });
-          })
-          .catch(error => {
-            alert("ERROR: User name does not exists!");
-            console.log(error);
-          });
-      }
-    });
-  };
-
-  render() {
-    const { getFieldDecorator } = this.props.form;
-    let result = null;
-    if (this.state.res_received) {
-      alert('Login Succesful! Please go to "Ride" to book your ride.');
-      console.log(this.state.res_recieved);
+    const storedData = JSON.parse(localStorage.getItem("formData")); // retrieve stored data
+    if (!storedData) { // if data is not present in local storage
+      alert("ERROR: User does not exist!");
+    } else if (storedData.email !== email) { // if email does not match
+      alert("ERROR: Invalid Email!");
+    } else if (storedData.password !== password) { // if password does not match
+      alert("ERROR: Invalid Password!");
+    } else { // if all fields match with stored data
+      alert('Login Successful! Redirecting to Home Page...');
+      navigate('/bookACab'); // navigate to home page
     }
+  };
+  
 
-    return (
-      <Paper style={stylePaper}>
-        
-        <Form onSubmit={this.handleSubmit} className="signup-form">
-          <div style={{marginLeft:'0px', marginBottom: '40px'}}>
-              <Avatar src={SignInImage} size='80px' />  
-              <div style={styleText}>
-                Ride With Uber
-              </div>
-          </div>
-          <FormItem>
-            {getFieldDecorator("firstname", {
-              rules: [{ required: true, message: "Please input your First Name!" }]
-            })(<Input placeholder="First Name" />)}
-          </FormItem>
-          <FormItem>
-            {getFieldDecorator("password", {
-              rules: [
-                { required: true, message: "Please input your Password!" },
-                { min: 8, message: "Minimum password length is 8 characters" }
-              ]
-            })(<Input type="password" placeholder="Password" />)}
-          </FormItem>
-          <FormItem>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="signup-form-button"
-            >
-              LOGIN
-            </Button>
-            Or <a href="/UserSignIn">Sign Up</a>
-          </FormItem>
-          {result}
-        </Form>
-      </Paper>
-    );
-  }
-}
+  return (
+    <Paper style={stylePaper}>
+      <Form onSubmit={handleSubmit} className="signin-form">
+        <div style={{marginLeft:'0px', marginBottom: '40px'}}>
+            <Avatar src={SignInImage} size='80px' />  
+            <div style={styleText}>
+              Ride With Uber
+            </div>
+        </div>
+        <Form.Item>
+          <Input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            required
+          />
+        </Form.Item>
+        <Form.Item>
+          <Input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            required
+          />
+        </Form.Item>
+        <Form.Item>
+          <Button type="primary" htmlType="submit" className="signin-form-button">
+            LOGIN
+          </Button>
+          Or <a href="/UserSignUp">Sign Up</a>
+        </Form.Item>
+      </Form>
+    </Paper>
+  );
+};
 
-const Sign_up = Form.create()(Signup);
-
-export default Sign_up;
+export default Signin;

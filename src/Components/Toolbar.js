@@ -4,12 +4,12 @@ import FlatButton from 'material-ui/FlatButton';
 import {Tabs, Tab} from 'material-ui/Tabs';
 
 const styleDiv = {
-  padding: '0px 127px',
+  // padding: '0px 127px',
 };
 
 const styleToolbar = {
-  background: 'white',
-  padding: '0px',
+  background: 'black',
+  // padding: '0px',
 };
 
 const styleUber = {
@@ -25,21 +25,22 @@ const StyleTab = {
   TabLeft : {
   padding: '0px 20px',
   borderTop: '4px',
-  background: 'white',
-  color: 'black',
+  background: 'black',
+  color: 'white',
   textTransform: 'capitalize',
   },
   TabRight: {
     padding: '0px',
     margin: '0px',
     borderTop: '4px',
-    background: 'white',
-    color: 'black',
+    background: 'black',
+    color: 'white',
   },
 };
 
 const styleInkBar = {
   background:'white',
+  color: 'whilte'
 };
 
 export default class ToolbarExamplesSimple extends React.Component {

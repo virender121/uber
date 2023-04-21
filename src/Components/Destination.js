@@ -54,7 +54,7 @@ import Paper from 'material-ui/Paper';
 import Avatar from 'material-ui/Avatar';
 import DriverImage from './Images/driver.jpg';
 import { Form, Input, Button } from "antd";
-//import { locales } from "moment";
+import { locales } from "moment";
 
 const stylePaper = {
   height: '360px',
@@ -138,7 +138,8 @@ class Signup extends Component {
     }
 
     return (
-      <Paper style={stylePaper}>
+<div className='cards' style={{backgroundImage:'url(https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,w_1349,h_644/v1613521692/assets/d9/ce6c00-32b0-4b93-9f0d-6f927d93da08/original/Rider_Home_bg_desktop2x.png)', backgroundSize: 'cover', height:"100%"}}>
+<Paper style={stylePaper}>
         
         <Form onSubmit={this.handleSubmit} className="signup-form">
           <div style={{marginTop: '20px', marginBottom: '20px'}}> 
@@ -175,6 +176,7 @@ class Signup extends Component {
             LOOK FOR CABS NEAR YOU!  
         </Button>
       </Paper>
+      </div>
     );
   }
 }
